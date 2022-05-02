@@ -1,0 +1,1408 @@
+openapi: 3.0.1
+info:
+  contact:
+    name: API Support
+    url: https://docs.estuary.tech/feedback
+  description: This is the API for the Estuary application.
+  license:
+    name: Apache 2.0 Apache-2.0 OR MIT
+    url: https://github.com/application-research/estuary/blob/master/LICENSE.md
+  termsOfService: http://estuary.tech
+  title: Estuary API
+  version: 1.0.0
+servers:
+- url: //api.estuary.tech/
+security:
+- bearerAuth: []
+paths:
+  /collections/add-content:
+    post:
+      description: "When a collection is created, users with valid API keys can add\
+        \ contents to the collection. This endpoint can be used to add contents to\
+        \ a collection."
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/main.addContentToCollectionParams'
+        description: Contents to add to collection
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                additionalProperties:
+                  type: string
+                type: object
+          description: OK
+      summary: Add contents to a collection
+      tags:
+      - collections
+      x-codegen-request-body-name: body
+      x-content-type: application/json
+      x-accepts: application/json
+  /collections/content/{coluuid}:
+    get:
+      description: "This endpoint is used to get contents in a collection. When a\
+        \ collection is created, this collection object is retrievable along with\
+        \ its content via this endpoint."
+      parameters:
+      - description: coluuid
+        in: path
+        name: coluuid
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: string
+          description: OK
+      summary: Get contents in a collection
+      tags:
+      - collections
+      x-accepts: application/json
+  /collections/create:
+    post:
+      description: This endpoint is used to create a new collection. A collection
+        is a representaion of a group of objects added on the estuary. This endpoint
+        can be used to create a new collection.
+      requestBody:
+        content:
+          '*/*':
+            schema:
+              $ref: '#/components/schemas/main.createCollectionBody'
+        description: Collection name and description
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/main.Collection'
+          description: OK
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/util.HttpError'
+          description: Bad Request
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/util.HttpError'
+          description: Not Found
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/util.HttpError'
+          description: Internal Server Error
+      summary: Create a new collection
+      tags:
+      - collections
+      x-codegen-request-body-name: body
+      x-content-type: '*/*'
+      x-accepts: application/json
+  /collections/fs/add:
+    post:
+      description: This endpoint adds a file to a collection
+      parameters:
+      - description: Collection ID
+        in: query
+        name: col
+        required: true
+        schema:
+          type: string
+      - description: Collection ID Long
+        in: query
+        name: collection
+        required: true
+        schema:
+          type: string
+      - description: Content
+        in: query
+        name: content
+        required: true
+        schema:
+          type: string
+      - description: Path to file
+        in: query
+        name: path
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: string
+          description: OK
+      summary: Add a file to a collection
+      tags:
+      - collections
+      x-accepts: application/json
+  /collections/fs/list:
+    get:
+      description: This endpoint creates a new collection
+      parameters:
+      - description: Collection
+        in: query
+        name: col
+        required: true
+        schema:
+          type: string
+      - description: Directory
+        in: query
+        name: dir
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: string
+          description: OK
+      summary: Create a new collection
+      tags:
+      - collections
+      x-accepts: application/json
+  /collections/list:
+    get:
+      description: "This endpoint is used to list all collections. Whenever a user\
+        \ logs on estuary, it will list all collections that the user has access to.\
+        \ This endpoint provides a way to list all collections to the user."
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/main.Collection'
+                type: array
+          description: OK
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/util.HttpError'
+          description: Bad Request
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/util.HttpError'
+          description: Not Found
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/util.HttpError'
+          description: Internal Server Error
+      summary: List all collections
+      tags:
+      - collections
+      x-accepts: application/json
+  /content/add:
+    post:
+      description: This endpoint is used to upload new content.
+      parameters:
+      - description: Collection
+        in: query
+        name: collection
+        schema:
+          type: string
+      - description: Collection Path
+        in: query
+        name: collectionPath
+        schema:
+          type: string
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              properties:
+                file:
+                  description: File to upload
+                  format: binary
+                  type: string
+              required:
+              - file
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: string
+          description: OK
+      summary: Add new content
+      tags:
+      - content
+      x-content-type: multipart/form-data
+      x-accepts: application/json
+  /content/add-car:
+    post:
+      description: This endpoint is used to add a car object to the network. The object
+        can be a file or a directory.
+      parameters:
+      - description: Filename
+        in: query
+        name: filename
+        schema:
+          type: string
+      - description: Commp
+        in: query
+        name: commp
+        schema:
+          type: string
+      - description: Size
+        in: query
+        name: size
+        schema:
+          type: string
+      requestBody:
+        content:
+          '*/*':
+            schema:
+              type: string
+        description: Car
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: string
+          description: OK
+      summary: Add Car object
+      tags:
+      - content
+      x-codegen-request-body-name: body
+      x-content-type: '*/*'
+      x-accepts: application/json
+  /content/add-ipfs:
+    post:
+      description: This endpoint is used to add an IPFS object to the network. The
+        object can be a file or a directory.
+      requestBody:
+        content:
+          '*/*':
+            schema:
+              $ref: '#/components/schemas/util.ContentAddIpfsBody'
+        description: IPFS Body
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: string
+          description: OK
+      summary: Add IPFS object
+      tags:
+      - content
+      x-codegen-request-body-name: body
+      x-content-type: '*/*'
+      x-accepts: application/json
+  /content/aggregated/{content}:
+    get:
+      description: This endpoint returns aggregated content stats
+      parameters:
+      - description: Content ID
+        in: path
+        name: content
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: string
+          description: OK
+      summary: Get aggregated content stats
+      tags:
+      - content
+      x-accepts: application/json
+  /content/all-deals:
+    get:
+      description: This endpoint is used to get all deals for a user
+      parameters:
+      - description: Begin
+        in: query
+        name: begin
+        required: true
+        schema:
+          type: string
+      - description: Duration
+        in: query
+        name: duration
+        required: true
+        schema:
+          type: string
+      - description: All
+        in: query
+        name: all
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: string
+          description: OK
+      summary: Get all deals for a user
+      tags:
+      - content
+      x-accepts: application/json
+  /content/by-cid/{cid}:
+    get:
+      description: This endpoint returns the content associated with a CID
+      parameters:
+      - description: Cid
+        in: path
+        name: cid
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: string
+          description: OK
+      summary: Get Content by Cid
+      tags:
+      - public
+      x-accepts: application/json
+  /content/bw-usage/{content}:
+    get:
+      description: This endpoint returns content bandwidth
+      parameters:
+      - description: Content ID
+        in: path
+        name: content
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: string
+          description: OK
+      summary: Get content bandwidth
+      tags:
+      - content
+      x-accepts: application/json
+  /content/create:
+    post:
+      description: This endpoint adds a new content
+      requestBody:
+        content:
+          '*/*':
+            schema:
+              type: string
+        description: Content
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: string
+          description: OK
+      summary: Add a new content
+      tags:
+      - content
+      x-codegen-request-body-name: body
+      x-content-type: '*/*'
+      x-accepts: application/json
+  /content/deals:
+    get:
+      description: This endpoint lists all content with deals
+      parameters:
+      - description: Limit
+        in: query
+        name: limit
+        schema:
+          type: integer
+      - description: Offset
+        in: query
+        name: offset
+        schema:
+          type: integer
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: string
+          description: OK
+      summary: Content with deals
+      tags:
+      - content
+      x-accepts: application/json
+  /content/ensure-replication/{datacid}:
+    get:
+      description: This endpoint ensures that the content is replicated to the specified
+        number of providers
+      parameters:
+      - description: Data CID
+        in: path
+        name: datacid
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: string
+          description: OK
+      summary: Ensure Replication
+      tags:
+      - content
+      x-accepts: application/json
+  /content/failures/{content}:
+    get:
+      description: This endpoint returns all failures for a content
+      parameters:
+      - description: Content ID
+        in: path
+        name: content
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: string
+          description: OK
+      summary: List all failures for a content
+      tags:
+      - content
+      x-accepts: application/json
+  /content/importdeal:
+    post:
+      description: This endpoint imports a deal into the shuttle.
+      requestBody:
+        content:
+          '*/*':
+            schema:
+              $ref: '#/components/schemas/main.importDealBody'
+        description: Import a deal
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: string
+          description: OK
+      summary: Import a deal
+      tags:
+      - content
+      x-codegen-request-body-name: body
+      x-content-type: '*/*'
+      x-accepts: application/json
+  /content/list:
+    get:
+      description: This endpoint lists all content
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                items:
+                  type: string
+                type: array
+          description: OK
+      summary: List all pinned content
+      tags:
+      - content
+      x-accepts: application/json
+  /content/read/{cont}:
+    get:
+      description: This endpoint reads content from the blockstore
+      parameters:
+      - description: CID
+        in: path
+        name: cont
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: string
+          description: OK
+      summary: Read content
+      tags:
+      - content
+      x-accepts: application/json
+  /content/staging-zones:
+    get:
+      description: This endpoint is used to get staging zone for user.
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: string
+          description: OK
+      summary: Get staging zone for user
+      tags:
+      - content
+      x-accepts: application/json
+  /content/stats:
+    get:
+      description: This endpoint is used to get content statistics. Every content
+        stored in the network (estuary) is tracked by a unique ID which can be used
+        to get information about the content. This endpoint will allow the consumer
+        to get the collected stats of a conten
+      parameters:
+      - description: limit
+        in: query
+        name: limit
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: string
+          description: OK
+      summary: Get content statistics
+      tags:
+      - content
+      x-accepts: application/json
+  /content/status/{id}:
+    get:
+      description: This endpoint returns the status of a content
+      parameters:
+      - description: Content ID
+        in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: string
+          description: OK
+      summary: Content Status
+      tags:
+      - content
+      x-accepts: application/json
+  /deals/estimate:
+    post:
+      description: This endpoint estimates the cost of a deal
+      requestBody:
+        content:
+          '*/*':
+            schema:
+              $ref: '#/components/schemas/main.estimateDealBody'
+        description: "The size of the deal in bytes, the replication factor, and the\
+          \ duration of the deal in blocks"
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: string
+          description: OK
+      summary: Estimate the cost of a deal
+      tags:
+      - deals
+      x-codegen-request-body-name: body
+      x-content-type: '*/*'
+      x-accepts: application/json
+  /deals/info/{dealid}:
+    get:
+      description: This endpoint returns the deal info for a deal
+      parameters:
+      - description: Deal ID
+        in: path
+        name: dealid
+        required: true
+        schema:
+          type: integer
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: string
+          description: OK
+      summary: Get Deal Info
+      tags:
+      - deals
+      x-accepts: application/json
+  /deals/make/{miner}:
+    post:
+      description: This endpoint makes a deal for a given content and miner
+      parameters:
+      - description: Miner
+        in: path
+        name: miner
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          '*/*':
+            schema:
+              type: string
+        description: Deal Request
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: string
+          description: OK
+      summary: Make Deal
+      tags:
+      - deals
+      x-codegen-request-body-name: dealRequest
+      x-content-type: '*/*'
+      x-accepts: application/json
+  /deals/proposal/{propcid}:
+    get:
+      description: This endpoint returns the proposal for a deal
+      parameters:
+      - description: Proposal CID
+        in: path
+        name: propcid
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: string
+          description: OK
+      summary: Get Proposal
+      tags:
+      - deals
+      x-accepts: application/json
+  /deals/query/{miner}:
+    get:
+      description: This endpoint returns the ask for a given CID
+      parameters:
+      - description: CID
+        in: path
+        name: miner
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: string
+          description: OK
+      summary: Query Ask
+      tags:
+      - deals
+      x-accepts: application/json
+  /deals/status-by-proposal/{propcid}:
+    get:
+      description: Get Deal Status by PropCid
+      parameters:
+      - description: PropCid
+        in: path
+        name: propcid
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: string
+          description: OK
+      summary: Get Deal Status by PropCid
+      tags:
+      - deals
+      x-accepts: application/json
+  /deals/status/{deal}:
+    get:
+      description: This endpoint returns the status of a deal
+      parameters:
+      - description: Deal ID
+        in: path
+        name: deal
+        required: true
+        schema:
+          type: integer
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: string
+          description: OK
+      summary: Get Deal Status
+      tags:
+      - deals
+      x-accepts: application/json
+  /deals/status/{miner}/{propcid}:
+    get:
+      description: This endpoint returns the status of a deal
+      parameters:
+      - description: Miner
+        in: path
+        name: miner
+        required: true
+        schema:
+          type: string
+      - description: Proposal CID
+        in: path
+        name: propcid
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: string
+          description: OK
+      summary: Deal Status
+      tags:
+      - deals
+      x-accepts: application/json
+  /deals/transfer/in-progress:
+    get:
+      description: This endpoint returns the in-progress transfers
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: string
+          description: OK
+      summary: Transfer In Progress
+      tags:
+      - deals
+      x-accepts: application/json
+  /deals/transfer/status:
+    post:
+      description: This endpoint returns the status of a transfer
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: string
+          description: OK
+      summary: Transfer Status
+      tags:
+      - deals
+      x-accepts: application/json
+  /deals/failures:
+    get:
+      description: This endpoint returns a list of storage failures
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: string
+          description: OK
+      summary: Get storage failures
+      tags:
+      - deals
+      x-accepts: application/json
+  /pinning/pins:
+    get:
+      description: This endpoint lists all pinned objects
+      responses:
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/util.HttpError'
+          description: Bad Request
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/util.HttpError'
+          description: Not Found
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/util.HttpError'
+          description: Internal Server Error
+      summary: List all pinned objects
+      tags:
+      - pinning
+      x-accepts: application/json
+    post:
+      description: This endpoint adds a pin to the IPFS daemon.
+      parameters:
+      - description: cid
+        in: query
+        name: cid
+        required: true
+        schema:
+          type: string
+      - description: name
+        in: query
+        name: name
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: string
+          description: OK
+      summary: Add and pin object
+      tags:
+      - pinning
+      x-accepts: application/json
+  /pinning/pins/{requestid}:
+    delete:
+      description: This endpoint deletes a pinned object.
+      parameters:
+      - description: requestid
+        in: path
+        name: requestid
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: string
+          description: OK
+      summary: Delete a pinned object
+      tags:
+      - pinning
+      x-accepts: application/json
+    get:
+      description: This endpoint returns a pinned object.
+      parameters:
+      - description: cid
+        in: path
+        name: requestid
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: string
+          description: OK
+      summary: Get a pinned objects
+      tags:
+      - pinning
+      x-accepts: application/json
+    post:
+      description: This endpoint replaces a pinned object.
+      parameters:
+      - description: id
+        in: path
+        name: requestid
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: string
+          description: OK
+      summary: Replace a pinned object
+      tags:
+      - pinning
+      x-accepts: application/json
+  /public/by-cid/{cid}:
+    get:
+      description: This endpoint returns the content associated with a CID
+      parameters:
+      - description: Cid
+        in: path
+        name: cid
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: string
+          description: OK
+      summary: Get Content by Cid
+      tags:
+      - public
+      x-accepts: application/json
+  /public/info:
+    get:
+      description: This endpoint returns information about the node
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: string
+          description: OK
+      summary: Get public node info
+      tags:
+      - public
+      x-accepts: application/json
+  /public/metrics/deals-on-chain:
+    get:
+      description: This endpoint is used to get deal metrics
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: string
+          description: OK
+      summary: Get deal metrics
+      tags:
+      - public
+      - metrics
+      x-accepts: application/json
+  /public/miners:
+    get:
+      description: This endpoint returns all miners
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: string
+          description: OK
+      summary: Get all miners
+      tags:
+      - public
+      - net
+      x-accepts: application/json
+  /public/miners/deals/{miner}:
+    get:
+      description: This endpoint returns all miners deals
+      parameters:
+      - description: Filter by miner
+        in: path
+        name: miner
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: string
+          description: OK
+      summary: Get all miners deals
+      tags:
+      - public
+      - miner
+      x-accepts: application/json
+  /public/miners/failures/{miner}:
+    get:
+      description: This endpoint returns all miners
+      parameters:
+      - description: Filter by miner
+        in: path
+        name: miner
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: string
+          description: OK
+      summary: Get all miners
+      tags:
+      - public
+      - net
+      x-accepts: application/json
+  /public/miners/storage/query/{miner}:
+    get:
+      description: This endpoint returns miner storage
+      parameters:
+      - description: Filter by miner
+        in: path
+        name: miner
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: string
+          description: OK
+      summary: Get miner stats
+      tags:
+      - public
+      x-accepts: application/json
+  /public/miners/stats/{miner}:
+    get:
+      description: This endpoint returns miner stats
+      parameters:
+      - description: Filter by miner
+        in: path
+        name: miner
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: string
+          description: OK
+      summary: Get miner stats
+      tags:
+      - public
+      - miner
+      x-accepts: application/json
+  /public/net/addrs:
+    get:
+      description: This endpoint is used to get net addrs
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                items:
+                  type: string
+                type: array
+          description: OK
+      summary: Net Addrs
+      tags:
+      - public
+      - net
+      x-accepts: application/json
+  /public/net/peers:
+    get:
+      description: This endpoint is used to get net peers
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                items:
+                  type: string
+                type: array
+          description: OK
+      summary: Net Peers
+      tags:
+      - public
+      - net
+      x-accepts: application/json
+  /public/stats:
+    get:
+      description: This endpoint is used to get public stats.
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: string
+          description: OK
+      summary: Public stats
+      tags:
+      - public
+      x-accepts: application/json
+  /user/api-keys:
+    get:
+      description: "This endpoint is used to get API keys for a user. In estuary,\
+        \ each user can be given multiple API keys (tokens). This endpoint can be\
+        \ used to retrieve all available API keys for a given user."
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/main.getApiKeysResp'
+                type: array
+          description: OK
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/util.HttpError'
+          description: Bad Request
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/util.HttpError'
+          description: Not Found
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/util.HttpError'
+          description: Internal Server Error
+      summary: Get API keys for a user
+      tags:
+      - User
+      x-accepts: application/json
+    post:
+      description: "This endpoint is used to create API keys for a user. In estuary,\
+        \ each user is given an API key to access all features."
+      parameters:
+      - description: perm
+        in: query
+        name: perm
+        schema:
+          type: string
+      - description: expiry
+        in: query
+        name: expiry
+        schema:
+          type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/main.getApiKeysResp'
+          description: OK
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/util.HttpError'
+          description: Bad Request
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/util.HttpError'
+          description: Not Found
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/util.HttpError'
+          description: Internal Server Error
+      summary: Create API keys for a user
+      tags:
+      - User
+      x-accepts: application/json
+  /user/api-keys/{key}:
+    delete:
+      description: "This endpoint is used to revoke a user API key. In estuary, every\
+        \ user is assigned with an API key, this API key is generated and issued for\
+        \ each user and is primarily use to access all estuary features. This endpoint\
+        \ can be used to revoke the API key thats assigned to the user."
+      parameters:
+      - description: Key
+        in: path
+        name: key
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: string
+          description: OK
+      summary: Revoke a User API Key.
+      tags:
+      - User
+      x-accepts: application/json
+  /user/export:
+    get:
+      description: This endpoint is used to get API keys for a user.
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: string
+          description: OK
+      summary: Export user data
+      tags:
+      - User
+      x-accepts: application/json
+  /user/stats:
+    get:
+      description: This endpoint is used to create API keys for a user.
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/main.userStatsResponse'
+          description: OK
+      summary: Create API keys for a user
+      tags:
+      - User
+      x-accepts: application/json
+components:
+  schemas:
+    main.Collection:
+      example:
+        createdAt: createdAt
+        name: name
+        description: description
+        userId: 0
+        uuid: uuid
+      properties:
+        createdAt:
+          type: string
+        description:
+          type: string
+        name:
+          type: string
+        userId:
+          type: integer
+        uuid:
+          type: string
+      type: object
+    main.addContentToCollectionParams:
+      properties:
+        cids:
+          items:
+            type: string
+          type: array
+        collection:
+          type: string
+        contents:
+          items:
+            type: integer
+          type: array
+      type: object
+    main.createCollectionBody:
+      properties:
+        description:
+          type: string
+        name:
+          type: string
+      type: object
+    main.estimateDealBody:
+      properties:
+        durationBlks:
+          type: integer
+        replication:
+          type: integer
+        size:
+          type: integer
+        verified:
+          type: boolean
+      type: object
+    main.getApiKeysResp:
+      example:
+        expiry: expiry
+        token: token
+      properties:
+        expiry:
+          type: string
+        token:
+          type: string
+      type: object
+    main.importDealBody:
+      properties:
+        collection:
+          type: string
+        collectionPath:
+          type: string
+        dealIDs:
+          items:
+            type: integer
+          type: array
+        name:
+          type: string
+      type: object
+    main.userStatsResponse:
+      example:
+        totalSize: 6
+        numPins: 0
+      properties:
+        numPins:
+          type: integer
+        totalSize:
+          type: integer
+      type: object
+    util.ContentAddIpfsBody:
+      properties:
+        collection:
+          type: string
+        collectionPath:
+          type: string
+        name:
+          type: string
+        peers:
+          items:
+            type: string
+          type: array
+        root:
+          type: string
+      type: object
+    util.HttpError:
+      properties:
+        code:
+          type: integer
+        details:
+          type: string
+        message:
+          type: string
+      type: object
+  securitySchemes:
+    bearerAuth:
+      in: header
+      name: Authorization
+      type: apiKey
+x-original-swagger-version: "2.0"
+
