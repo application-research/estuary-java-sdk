@@ -229,12 +229,12 @@ paths:
           multipart/form-data:
             schema:
               properties:
-                file:
+                data:
                   description: File to upload
                   format: binary
                   type: string
               required:
-              - file
+              - data
         required: true
       responses:
         "200":
