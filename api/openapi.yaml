@@ -530,9 +530,7 @@ paths:
           content:
             application/json:
               schema:
-                items:
-                  type: string
-                type: array
+                type: string
           description: OK
       summary: List all pinned content
       tags:
