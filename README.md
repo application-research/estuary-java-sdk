@@ -1,3 +1,5 @@
+:no_entry: [DEPRECATED] Active at https://github.com/application-research/estuary-clients
+
 # openapi-java-client
 
 Estuary API
